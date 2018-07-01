@@ -1,0 +1,35 @@
+plugins {
+    id 'groovy'
+    id 'net.ltgt.apt' version '0.17'
+}
+
+group 'ogrigas'
+version '1.0'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+def lombokDependency = "org.projectlombok:lombok:1.18.0"
+def groovyDependency = "org.codehaus.groovy:groovy-all:2.4.15"
+def retrofitVersion = "2.4.0"
+
+dependencies {
+    annotationProcessor(lombokDependency)
+    compileOnly(lombokDependency, groovyDependency)
+    compile(
+        "com.sparkjava:spark-core:2.7.2",
+        "com.squareup.okhttp3:okhttp:3.10.0",
+        "com.squareup.retrofit2:retrofit:$retrofitVersion",
+        "com.squareup.retrofit2:converter-jackson:$retrofitVersion",
+        "ch.qos.logback:logback-classic:1.2.3",
+    )
+    testCompile(
+        groovyDependency,
+        "org.spockframework:spock-core:1.1-groovy-2.4",
+        "com.github.tomakehurst:wiremock:2.18.0",
+    )
+}
