@@ -17,4 +17,5 @@ public class JavaFramework {
     String license;
     URL repositoryUrl;
     int starCount;
+    int contributorCount;
 }

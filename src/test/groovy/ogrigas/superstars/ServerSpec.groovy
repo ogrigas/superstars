@@ -58,6 +58,14 @@ class ServerSpec extends Specification {
                 ]
             }
         """)))
+
+        github.givenThat(head(urlPathEqualTo("/repos/UserA/RepoA/contributors")).willReturn(ok()
+            .withHeader("Link", '<https://any.host/?page=11>; rel="last"')))
+
+        github.givenThat(head(urlPathEqualTo("/repos/UserB/RepoB/contributors")).willReturn(ok()
+            .withHeader("Link", '<https://any.host/?page=22>; rel="last"')))
+
+        github.givenThat(head(urlPathEqualTo("/repos/UserC/RepoC/contributors")).willReturn(ok()))
     }
 
     void cleanupSpec() {
@@ -75,6 +83,10 @@ class ServerSpec extends Specification {
             .withQueryParam("order", equalTo("desc"))
             .withQueryParam("per_page", equalTo(config.superstarLimit() as String)))
 
+        github.verify(3, headRequestedFor(urlPathMatching("/repos/.+/.+/contributors"))
+            .withQueryParam("anon", equalTo("true"))
+            .withQueryParam("per_page", equalTo("1")))
+
         response.code() == 200
         json(response) == [
             [
@@ -82,21 +94,24 @@ class ServerSpec extends Specification {
                 description: "Description A",
                 license: "License-A",
                 repositoryUrl: "https://url.a",
-                starCount: 333
+                starCount: 333,
+                contributorCount: 11
             ],
             [
                 name: "RepoB",
                 description: "Description B",
                 license: null,
                 repositoryUrl: "https://url.b",
-                starCount: 222
+                starCount: 222,
+                contributorCount: 22
             ],
             [
                 name: "RepoC",
                 description: "Description C",
                 license: null,
                 repositoryUrl: "https://url.c",
-                starCount: 111
+                starCount: 111,
+                contributorCount: 1
             ]
         ]
     }

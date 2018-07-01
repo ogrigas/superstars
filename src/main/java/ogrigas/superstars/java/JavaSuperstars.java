@@ -1,5 +1,6 @@
 package ogrigas.superstars.java;
 
+import ogrigas.superstars.github.GithubRepos;
 import ogrigas.superstars.github.GithubSearch;
 import ogrigas.superstars.github.RepoSearchQuery;
 
@@ -10,10 +11,12 @@ import static java.util.stream.Collectors.toList;
 public class JavaSuperstars {
 
     private final GithubSearch githubSearch;
+    private final GithubRepos githubRepos;
     private final int searchLimit;
 
-    public JavaSuperstars(GithubSearch githubSearch, int searchLimit) {
+    public JavaSuperstars(GithubSearch githubSearch, GithubRepos githubRepos, int searchLimit) {
         this.githubSearch = githubSearch;
+        this.githubRepos = githubRepos;
         this.searchLimit = searchLimit;
     }
 
@@ -31,6 +34,7 @@ public class JavaSuperstars {
                 .license(repo.license())
                 .repositoryUrl(repo.url())
                 .starCount(repo.starCount())
+                .contributorCount(githubRepos.totalContributors(repo.owner(), repo.name()))
                 .build())
             .collect(toList());
     }
