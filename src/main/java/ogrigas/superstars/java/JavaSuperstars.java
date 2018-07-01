@@ -4,6 +4,7 @@ import ogrigas.superstars.github.GithubRepos;
 import ogrigas.superstars.github.GithubSearch;
 import ogrigas.superstars.github.RepoSearchQuery;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -20,7 +21,7 @@ public class JavaSuperstars {
         this.searchLimit = searchLimit;
     }
 
-    public List<JavaFramework> list() {
+    public List<JavaFramework> list(Comparator<JavaFramework> sorting) {
         RepoSearchQuery query = RepoSearchQuery.builder()
             .term("framework")
             .language("Java")
@@ -36,6 +37,7 @@ public class JavaSuperstars {
                 .starCount(repo.starCount())
                 .contributorCount(githubRepos.totalContributors(repo.owner(), repo.name()))
                 .build())
+            .sorted(sorting)
             .collect(toList());
     }
 }

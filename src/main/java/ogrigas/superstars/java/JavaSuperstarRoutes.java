@@ -20,7 +20,9 @@ public class JavaSuperstarRoutes {
         service.after((req, resp) -> resp.type("application/json"));
 
         service.get("/java-superstars", (req, resp) -> {
-            return javaSuperstars.list();
+            String sortField = req.queryParamOrDefault("sortBy", "");
+            String direction = req.queryParamOrDefault("direction", "");
+            return javaSuperstars.list(JavaFramework.sorting(sortField, "ascending".equals(direction)));
         }, toJson);
     }
 }

@@ -1,13 +1,13 @@
 package ogrigas.superstars
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomakehurst.wiremock.junit.WireMockRule
+import com.github.tomakehurst.wiremock.WireMockServer
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.junit.Rule
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*
 
@@ -15,8 +15,7 @@ class ServerSpec extends Specification {
 
     @Shared localPort = 60000
     @Shared githubPort = 60001
-
-    @Rule WireMockRule github = new WireMockRule(githubPort)
+    @Shared WireMockServer github = new WireMockServer(githubPort)
 
     @Shared config = Config.builder()
         .localPort(localPort)
@@ -27,7 +26,13 @@ class ServerSpec extends Specification {
     @Shared server = new Server(config)
     @Shared client = new OkHttpClient()
 
+    void setupSpec() {
+        github.start()
+    }
+
     void setup() {
+        github.resetAll()
+
         github.givenThat(get(urlPathEqualTo("/search/repositories")).willReturn(ok().withBody("""
             {
                 "total_count": 99,
@@ -70,11 +75,12 @@ class ServerSpec extends Specification {
 
     void cleanupSpec() {
         server.stop()
+        github.stop()
     }
 
     def "fetches most popular Java frameworks"() {
         when:
-        def response = request(path("/java-superstars"))
+        def response = request(uri("/java-superstars"))
 
         then:
         github.verify(getRequestedFor(urlPathEqualTo("/search/repositories"))
@@ -116,8 +122,28 @@ class ServerSpec extends Specification {
         ]
     }
 
-    private Request.Builder path(String path) {
-        new Request.Builder().url("http://localhost:$localPort" + path)
+    @Unroll
+    def "sorts results by '#field' in '#direction' order"() {
+        when:
+        def response = request(uri("/java-superstars?sortBy=${field}&direction=${direction}"))
+
+        then:
+        response.code() == 200
+        json(response)*.name == resultingNames
+
+        where:
+        field              | direction    || resultingNames
+        "starCount"        | "ascending"  || ["RepoC", "RepoB", "RepoA"]
+        "starCount"        | "descending" || ["RepoA", "RepoB", "RepoC"]
+        "starCount"        | ""           || ["RepoA", "RepoB", "RepoC"]
+        "contributorCount" | "ascending"  || ["RepoC", "RepoA", "RepoB"]
+        "contributorCount" | "descending" || ["RepoB", "RepoA", "RepoC"]
+        "contributorCount" | ""           || ["RepoB", "RepoA", "RepoC"]
+        ""                 | ""           || ["RepoA", "RepoB", "RepoC"]
+    }
+
+    private Request.Builder uri(String uri) {
+        new Request.Builder().url("http://localhost:$localPort" + uri)
     }
 
     private Response request(Request.Builder requestBuilder) {
