@@ -10,6 +10,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*
+import static okhttp3.logging.HttpLoggingInterceptor.Level
 
 class ServerSpec extends Specification {
 
@@ -21,6 +22,7 @@ class ServerSpec extends Specification {
         .localPort(localPort)
         .githubUrl(new URL("http://localhost:$githubPort"))
         .superstarLimit(3)
+        .httpLogging(Level.BASIC)
         .build()
 
     @Shared server = new Server(config)

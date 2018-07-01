@@ -18,6 +18,7 @@ mainClassName = 'ogrigas.superstars.Server'
 
 def lombokDependency = "org.projectlombok:lombok:1.18.0"
 def groovyDependency = "org.codehaus.groovy:groovy-all:2.4.15"
+def okHttpVersion = "3.10.0"
 def retrofitVersion = "2.4.0"
 
 dependencies {
@@ -25,7 +26,8 @@ dependencies {
     compileOnly(lombokDependency, groovyDependency)
     compile(
         "com.sparkjava:spark-core:2.7.2",
-        "com.squareup.okhttp3:okhttp:3.10.0",
+        "com.squareup.okhttp3:okhttp:$okHttpVersion",
+        "com.squareup.okhttp3:logging-interceptor:$okHttpVersion",
         "com.squareup.retrofit2:retrofit:$retrofitVersion",
         "com.squareup.retrofit2:converter-jackson:$retrofitVersion",
         "ch.qos.logback:logback-classic:1.2.3",

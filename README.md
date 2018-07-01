@@ -26,6 +26,7 @@ Supported environment variables:
 - `LOCAL_PORT` (default 8080)
 - `GITHUB_URL` (default https://api.github.com)
 - `SUPERSTAR_LIMIT` (default 10)
+- `HTTP_LOGGING`: BASIC, HEADERS, BODY or NONE (default BASIC)
 
 ### Guidelines
 

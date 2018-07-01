@@ -7,6 +7,8 @@ import ogrigas.superstars.java.JavaSuperstarRoutes;
 import ogrigas.superstars.java.JavaSuperstars;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Service;
@@ -30,12 +32,13 @@ public class Server {
             .localPort(parseInt(env.getOrDefault("LOCAL_PORT", "8080")))
             .githubUrl(new URL(env.getOrDefault("GITHUB_URL", "https://api.github.com")))
             .superstarLimit(parseInt(env.getOrDefault("SUPERSTAR_LIMIT", "10")))
+            .httpLogging(Level.valueOf(env.getOrDefault("HTTP_LOGGING", "BASIC")))
             .build();
         new Server(config);
     }
 
     Server(Config config) {
-        GithubClient githubClient = new GithubClient(okHttp(), config.githubUrl());
+        GithubClient githubClient = new GithubClient(okHttp(config), config.githubUrl());
         JavaSuperstars javaSuperstars = new JavaSuperstars(
             new GithubSearch(githubClient),
             new GithubRepos(githubClient),
@@ -52,13 +55,15 @@ public class Server {
         log.info("Server stopped");
     }
 
-    private static OkHttpClient okHttp() {
+    private static OkHttpClient okHttp(Config config) {
+        Logger httpLog = LoggerFactory.getLogger("http.client");
         return new OkHttpClient.Builder()
             .connectTimeout(5, SECONDS)
             .retryOnConnectionFailure(true)
             .readTimeout(20, SECONDS)
             .writeTimeout(20, SECONDS)
             .connectionPool(new ConnectionPool(1, 10, MINUTES))
+            .addInterceptor(new HttpLoggingInterceptor(httpLog::debug).setLevel(config.httpLogging()))
             .build();
     }
 }
