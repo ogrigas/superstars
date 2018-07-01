@@ -5,6 +5,7 @@ import spark.ResponseTransformer;
 import spark.Service;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 
 public class JavaSuperstarRoutes {
@@ -16,7 +17,8 @@ public class JavaSuperstarRoutes {
     }
 
     public void addTo(Service service) {
-        ResponseTransformer toJson = new ObjectMapper().setVisibility(FIELD, ANY)::writeValueAsString;
+        ObjectMapper jsonMapper = new ObjectMapper().setVisibility(FIELD, ANY).setDefaultPropertyInclusion(NON_NULL);
+        ResponseTransformer toJson = jsonMapper::writeValueAsString;
         service.after((req, resp) -> resp.type("application/json"));
 
         service.get("/java-superstars", (req, resp) -> {

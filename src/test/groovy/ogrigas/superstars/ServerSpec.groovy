@@ -108,7 +108,6 @@ class ServerSpec extends Specification {
             [
                 name: "RepoB",
                 description: "Description B",
-                license: null,
                 repositoryUrl: "https://url.b",
                 starCount: 222,
                 contributorCount: 22
@@ -116,7 +115,6 @@ class ServerSpec extends Specification {
             [
                 name: "RepoC",
                 description: "Description C",
-                license: null,
                 repositoryUrl: "https://url.c",
                 starCount: 111,
                 contributorCount: 1
