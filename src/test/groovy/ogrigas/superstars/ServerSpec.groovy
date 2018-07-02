@@ -101,6 +101,7 @@ class ServerSpec extends Specification {
         response.code() == 200
         json(response) == [
             [
+                owner: "UserA",
                 name: "RepoA",
                 description: "Description A",
                 license: "License-A",
@@ -109,6 +110,7 @@ class ServerSpec extends Specification {
                 contributorCount: 11
             ],
             [
+                owner: "UserB",
                 name: "RepoB",
                 description: "Description B",
                 repositoryUrl: "https://url.b",
@@ -116,6 +118,7 @@ class ServerSpec extends Specification {
                 contributorCount: 22
             ],
             [
+                owner: "UserC",
                 name: "RepoC",
                 description: "Description C",
                 repositoryUrl: "https://url.c",

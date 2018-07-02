@@ -36,6 +36,7 @@ public class JavaSuperstars {
 
         return githubSearch.topActiveRepositories(query).stream()
             .map(repo -> JavaFramework.builder()
+                .owner(repo.owner())
                 .name(repo.name())
                 .description(repo.description())
                 .license(repo.license())

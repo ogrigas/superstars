@@ -16,6 +16,7 @@ import static java.util.Comparator.comparingInt;
 @AllArgsConstructor
 @Accessors(fluent = true)
 public class JavaFramework {
+    String owner;
     String name;
     String description;
     String license;
