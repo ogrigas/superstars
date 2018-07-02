@@ -203,7 +203,7 @@ class ServerSpec extends Specification {
 
         when:
         def response = request(uri("/java-superstars/UserA/RepoA/star")
-            .put(RequestBody.create(null, ""))
+            .put(emptyBody())
             .header("Authorization", basicAuth("USERNAME", "PASSWORD")))
 
         then:
@@ -213,23 +213,6 @@ class ServerSpec extends Specification {
 
         response.code() == 204
         response.header("Content-Type") == null
-    }
-
-    @Unroll
-    def "requires credentials to #performAction"() {
-        when:
-        def response = request(unauthorizedRequest)
-
-        then:
-        github.verify(0, anyRequestedFor(anyUrl()))
-
-        response.code() == 401
-        json(response) == [error: "Authorization header required"]
-
-        where:
-        performAction   | unauthorizedRequest
-        "star a repo"   | uri("/java-superstars/UserA/RepoA/star").put(RequestBody.create(null, ""))
-        "unstar a repo" | uri("/java-superstars/UserA/RepoA/star").delete()
     }
 
     def "unstars a repository"() {
@@ -249,12 +232,67 @@ class ServerSpec extends Specification {
         response.header("Content-Type") == null
     }
 
+    @Unroll
+    def "requires credentials to #performAction"() {
+        when:
+        def response = request(unauthorizedRequest)
+
+        then:
+        github.verify(0, anyRequestedFor(anyUrl()))
+
+        response.code() == 401
+        json(response) == [error: "Authorization header required"]
+
+        where:
+        performAction   | unauthorizedRequest
+        "star a repo"   | uri("/java-superstars/UserA/RepoA/star").put(emptyBody())
+        "unstar a repo" | uri("/java-superstars/UserA/RepoA/star").delete()
+    }
+
+    @Unroll
+    def "propagates GitHub error #githubStatus when #performingAction"() {
+        given:
+        github.givenThat(any(anyUrl()).willReturn(status(statusCode)))
+
+        when:
+        def response = request(incomingRequest.header("Authorization", "Basic any:credentials"))
+
+        then:
+        response.code() == statusCode
+        json(response) == [error: "Request rejected by GitHub"]
+
+        where:
+        performingAction  | incomingRequest                                           | statusCode
+        "listing repos"   | uri("/java-superstars").get()                             | 401
+        "listing repos"   | uri("/java-superstars").get()                             | 403
+        "starring repo"   | uri("/java-superstars/UserA/RepoA/star").put(emptyBody()) | 401
+        "starring repo"   | uri("/java-superstars/UserA/RepoA/star").put(emptyBody()) | 403
+        "unstarring repo" | uri("/java-superstars/UserA/RepoA/star").delete()         | 401
+        "unstarring repo" | uri("/java-superstars/UserA/RepoA/star").delete()         | 403
+    }
+
+    def "handles GitHub server errors"() {
+        given:
+        github.givenThat(any(anyUrl()).willReturn(status(503)))
+
+        when:
+        def response = request(uri("/java-superstars"))
+
+        then:
+        response.code() == 500
+        json(response) == [error: "GitHub API error 503"]
+    }
+
     private Request.Builder uri(String uri) {
         new Request.Builder().url("http://localhost:$localPort" + uri)
     }
 
     private static String basicAuth(String username, String password) {
         "Basic " + "$username:$password".bytes.encodeBase64()
+    }
+
+    private static RequestBody emptyBody() {
+        RequestBody.create(null, "")
     }
 
     private Response request(Request.Builder requestBuilder) {
