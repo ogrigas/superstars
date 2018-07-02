@@ -4,6 +4,7 @@ import ogrigas.superstars.github.Github;
 import ogrigas.superstars.github.GithubRepos;
 import ogrigas.superstars.github.GithubSearch;
 import ogrigas.superstars.github.GithubUserStarredRepos;
+import ogrigas.superstars.http.HttpError;
 import ogrigas.superstars.java.JavaSuperstarRoutes;
 import ogrigas.superstars.java.JavaSuperstars;
 import okhttp3.ConnectionPool;
@@ -47,9 +48,16 @@ public class Server {
             config.superstarLimit());
 
         service = Service.ignite().port(config.localPort());
+        setupErrorHandling(service);
         new JavaSuperstarRoutes(javaSuperstars).addTo(service);
         service.awaitInitialization();
         log.info("Server listening on port " + config.localPort());
+    }
+
+    private void setupErrorHandling(Service service) {
+        service.exception(HttpError.class, (ex, req, resp) -> ex.writeTo(resp));
+        service.notFound((req, resp) -> new HttpError(404, "Not Found").writeTo(resp));
+        service.internalServerError((req, resp) -> new HttpError(500, "Internal Error").writeTo(resp));
     }
 
     void stop() {

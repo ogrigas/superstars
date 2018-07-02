@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.Accessors;
-import ogrigas.superstars.http.ClientError;
+import ogrigas.superstars.http.HttpError;
 
 import java.net.URL;
 import java.util.Comparator;
@@ -34,7 +34,7 @@ public class JavaFramework {
         switch (field) {
             case "starCount":        return comparingInt(f -> f.starCount);
             case "contributorCount": return comparingInt(f -> f.contributorCount);
-            default: throw new ClientError("invalid sort field name");
+            default: throw new HttpError(400, "Invalid sort field name");
         }
     }
 }

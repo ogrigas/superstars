@@ -23,7 +23,7 @@ public class Authorization {
 
     public String requireHeader() {
         if (header == null) {
-            throw new ClientError("Authorization header required");
+            throw new HttpError(401, "Authorization header required");
         }
         return header;
     }

@@ -151,6 +151,15 @@ class ServerSpec extends Specification {
         ""                 | ""           || ["RepoA", "RepoB", "RepoC"]
     }
 
+    def "rejects request to sort by unsupported field"() {
+        when:
+        def response = request(uri("/java-superstars?sortBy=invalidField"))
+
+        then:
+        response.code() == 400
+        json(response) == [error: "Invalid sort field name"]
+    }
+
     def "accepts GitHub credentials and returns which repositories were starred by the client"() {
         given:
         github.givenThat(get(urlPathEqualTo("/user/starred/UserA/RepoA")).willReturn(status(204)))
@@ -204,6 +213,23 @@ class ServerSpec extends Specification {
 
         response.code() == 204
         response.header("Content-Type") == null
+    }
+
+    @Unroll
+    def "requires credentials to #performAction"() {
+        when:
+        def response = request(unauthorizedRequest)
+
+        then:
+        github.verify(0, anyRequestedFor(anyUrl()))
+
+        response.code() == 401
+        json(response) == [error: "Authorization header required"]
+
+        where:
+        performAction   | unauthorizedRequest
+        "star a repo"   | uri("/java-superstars/UserA/RepoA/star").put(RequestBody.create(null, ""))
+        "unstar a repo" | uri("/java-superstars/UserA/RepoA/star").delete()
     }
 
     def "unstars a repository"() {
