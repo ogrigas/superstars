@@ -4,10 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ogrigas.superstars.github.RepoKey;
 import ogrigas.superstars.http.Authorization;
+import spark.Request;
 import spark.Response;
 import spark.Service;
 
-import java.util.List;
+import java.util.Comparator;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -27,30 +28,26 @@ public class JavaSuperstarRoutes {
 
     public void addTo(Service service) {
         service.get("/java-superstars", (request, response) -> {
-            List<JavaFramework> body = javaSuperstars.list(
-                Authorization.fromHeader(request.headers("Authorization")),
-                JavaFramework.sorting(
-                    request.queryParamOrDefault("sortBy", ""),
-                    request.queryParamOrDefault("direction", "").equals("ascending"))
+            Comparator<JavaFramework> sorting = JavaFramework.sorting(
+                request.queryParamOrDefault("sortBy", ""),
+                request.queryParamOrDefault("direction", "").equals("ascending")
             );
-            return json(response, body);
+            return json(response, javaSuperstars.list(Authorization.from(request), sorting));
         });
 
         service.put("/java-superstars/:owner/:repoName/star", (request, response) -> {
-            javaSuperstars.star(
-                Authorization.fromHeader(request.headers("Authorization")),
-                new RepoKey(request.params("owner"), request.params("repoName"))
-            );
+            javaSuperstars.star(Authorization.from(request), repoKey(request));
             return noContent(response);
         });
 
         service.delete("/java-superstars/:owner/:repoName/star", (request, response) -> {
-            javaSuperstars.unstar(
-                Authorization.fromHeader(request.headers("Authorization")),
-                new RepoKey(request.params("owner"), request.params("repoName"))
-            );
+            javaSuperstars.unstar(Authorization.from(request), repoKey(request));
             return noContent(response);
         });
+    }
+
+    private static RepoKey repoKey(Request request) {
+        return new RepoKey(request.params("owner"), request.params("repoName"));
     }
 
     private static String json(Response response, Object object) throws JsonProcessingException {
