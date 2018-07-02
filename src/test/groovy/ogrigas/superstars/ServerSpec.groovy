@@ -201,6 +201,22 @@ class ServerSpec extends Specification {
         response.code() == 204
     }
 
+    def "unstars a repository"() {
+        given:
+        github.givenThat(delete(urlPathMatching("/user/starred/.*")).willReturn(status(204)))
+
+        when:
+        def response = request(uri("/java-superstars/UserA/RepoA/star")
+            .delete()
+            .header("Authorization", basicAuth("USERNAME", "PASSWORD")))
+
+        then:
+        github.verify(deleteRequestedFor(urlPathEqualTo("/user/starred/UserA/RepoA"))
+            .withBasicAuth(new BasicCredentials("USERNAME", "PASSWORD")))
+
+        response.code() == 204
+    }
+
     private Request.Builder uri(String uri) {
         new Request.Builder().url("http://localhost:$localPort" + uri)
     }

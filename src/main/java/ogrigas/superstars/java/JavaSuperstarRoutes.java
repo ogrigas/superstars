@@ -38,5 +38,13 @@ public class JavaSuperstarRoutes {
             resp.status(204);
             return "";
         });
+
+        service.delete("/java-superstars/:owner/:repoName/star", (req, resp) -> {
+            javaSuperstars.unstar(
+                Authorization.fromHeader(req.headers("Authorization")),
+                new RepoKey(req.params("owner"), req.params("repoName")));
+            resp.status(204);
+            return "";
+        });
     }
 }

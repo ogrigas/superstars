@@ -52,4 +52,8 @@ public class JavaSuperstars {
     public void star(Authorization auth, RepoKey repo) {
         githubUserStarred.addRepo(auth, repo);
     }
+
+    public void unstar(Authorization auth, RepoKey repo) {
+        githubUserStarred.removeRepo(auth, repo);
+    }
 }

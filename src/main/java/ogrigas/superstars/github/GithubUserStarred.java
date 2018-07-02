@@ -2,10 +2,7 @@ package ogrigas.superstars.github;
 
 import ogrigas.superstars.http.Authorization;
 import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.PUT;
-import retrofit2.http.Path;
+import retrofit2.http.*;
 
 public class GithubUserStarred {
 
@@ -26,6 +23,10 @@ public class GithubUserStarred {
         client.request(api.put(auth.header(), repo.owner(), repo.name()));
     }
 
+    public void removeRepo(Authorization auth, RepoKey repo) {
+        client.request(api.delete(auth.header(), repo.owner(), repo.name()));
+    }
+
     private interface Api {
 
         @GET("/user/starred/{owner}/{repo}")
@@ -36,6 +37,12 @@ public class GithubUserStarred {
 
         @PUT("/user/starred/{owner}/{repo}")
         Call<Void> put(
+            @Header("Authorization") String authorization,
+            @Path("owner") String owner,
+            @Path("repo") String repoName);
+
+        @DELETE("/user/starred/{owner}/{repo}")
+        Call<Void> delete(
             @Header("Authorization") String authorization,
             @Path("owner") String owner,
             @Path("repo") String repoName);
