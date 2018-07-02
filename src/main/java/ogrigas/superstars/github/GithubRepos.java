@@ -27,8 +27,8 @@ public class GithubRepos {
      * For efficiency, instead of fetching all contributors, we send a HEAD request for the first page
      * and then extract last page number from the "Link" header.
      */
-    public int totalContributors(String owner, String repoName) {
-        Response response = client.request(api.repositoryContributors(owner, repoName, true, 1));
+    public int totalContributors(RepoKey repo) {
+        Response response = client.request(api.repositoryContributors(repo.owner(), repo.name(), true, 1));
         Links links = Links.parse(response.headers().get("Link"));
         return links.rel("last")
             .map(URL::getQuery)

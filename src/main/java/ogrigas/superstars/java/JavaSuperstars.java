@@ -41,7 +41,7 @@ public class JavaSuperstars {
                 .license(repo.license())
                 .repositoryUrl(repo.url())
                 .starCount(repo.starCount())
-                .contributorCount(githubRepos.totalContributors(repo.owner(), repo.name()))
+                .contributorCount(githubRepos.totalContributors(repo.key()))
                 .starredByMe(auth.provided() ? githubUserStarred.containsRepo(auth, repo.key()) : null)
                 .build())
             .sorted(sorting)
