@@ -124,7 +124,7 @@ class ServerSpec extends Specification {
                 description: "Description C",
                 repositoryUrl: "https://url.c",
                 starCount: 111,
-                contributorCount: 1
+                contributorCount: 0
             ]
         ]
     }

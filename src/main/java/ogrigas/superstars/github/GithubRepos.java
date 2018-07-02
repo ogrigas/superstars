@@ -36,7 +36,7 @@ public class GithubRepos {
             .filter(Matcher::matches)
             .map(m -> m.group(1))
             .map(Integer::parseInt)
-            .orElse(1);
+            .orElse(0);
     }
 
     private interface Api {
