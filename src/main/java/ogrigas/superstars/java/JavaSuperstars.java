@@ -48,4 +48,8 @@ public class JavaSuperstars {
             .sorted(sorting)
             .collect(toList());
     }
+
+    public void star(Authorization auth, RepoKey repo) {
+        githubUserStarred.addRepo(auth, repo);
+    }
 }

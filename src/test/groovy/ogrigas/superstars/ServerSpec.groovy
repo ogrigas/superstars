@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.BasicCredentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.Response
 import spock.lang.Shared
 import spock.lang.Specification
@@ -181,6 +182,23 @@ class ServerSpec extends Specification {
             .withHeader("Authorization", equalTo("token XYZ")))
 
         response.code() == 200
+    }
+
+    def "stars a repository"() {
+        given:
+        github.givenThat(put(urlPathMatching("/user/starred/.*")).willReturn(status(204)))
+
+        when:
+        def response = request(uri("/java-superstars/UserA/RepoA/star")
+            .put(RequestBody.create(null, ""))
+            .header("Authorization", basicAuth("USERNAME", "PASSWORD")))
+
+        then:
+        github.verify(putRequestedFor(urlPathEqualTo("/user/starred/UserA/RepoA"))
+            .withHeader("Content-Length", equalTo("0"))
+            .withBasicAuth(new BasicCredentials("USERNAME", "PASSWORD")))
+
+        response.code() == 204
     }
 
     private Request.Builder uri(String uri) {

@@ -1,6 +1,7 @@
 package ogrigas.superstars.java;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ogrigas.superstars.github.RepoKey;
 import ogrigas.superstars.http.Authorization;
 import spark.ResponseTransformer;
 import spark.Service;
@@ -27,8 +28,15 @@ public class JavaSuperstarRoutes {
                 Authorization.fromHeader(req.headers("Authorization")),
                 JavaFramework.sorting(
                     req.queryParamOrDefault("sortBy", ""),
-                    req.queryParamOrDefault("direction", "").equals("ascending")
-                ))
-        , toJson);
+                    req.queryParamOrDefault("direction", "").equals("ascending"))),
+            toJson);
+
+        service.put("/java-superstars/:owner/:repoName/star", (req, resp) -> {
+            javaSuperstars.star(
+                Authorization.fromHeader(req.headers("Authorization")),
+                new RepoKey(req.params("owner"), req.params("repoName")));
+            resp.status(204);
+            return "";
+        });
     }
 }
