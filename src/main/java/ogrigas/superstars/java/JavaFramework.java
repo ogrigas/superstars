@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.experimental.Accessors;
+import ogrigas.superstars.http.ClientError;
 
 import java.net.URL;
 import java.util.Comparator;
@@ -21,6 +22,7 @@ public class JavaFramework {
     URL repositoryUrl;
     int starCount;
     int contributorCount;
+    Boolean starredByMe;
 
     static Comparator<JavaFramework> sorting(String field, boolean ascending) {
         Comparator<JavaFramework> order = fieldComparator(field.isEmpty() ? "starCount" : field);
@@ -31,7 +33,7 @@ public class JavaFramework {
         switch (field) {
             case "starCount":        return comparingInt(f -> f.starCount);
             case "contributorCount": return comparingInt(f -> f.contributorCount);
-            default: throw new BadInput("invalid sort field parameter");
+            default: throw new ClientError("invalid sort field name");
         }
     }
 }

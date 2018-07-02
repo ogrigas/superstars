@@ -3,6 +3,7 @@ package ogrigas.superstars;
 import ogrigas.superstars.github.GithubClient;
 import ogrigas.superstars.github.GithubRepos;
 import ogrigas.superstars.github.GithubSearch;
+import ogrigas.superstars.github.GithubUserStarred;
 import ogrigas.superstars.java.JavaSuperstarRoutes;
 import ogrigas.superstars.java.JavaSuperstars;
 import okhttp3.ConnectionPool;
@@ -42,6 +43,7 @@ public class Server {
         JavaSuperstars javaSuperstars = new JavaSuperstars(
             new GithubSearch(githubClient),
             new GithubRepos(githubClient),
+            new GithubUserStarred(githubClient),
             config.superstarLimit());
 
         service = Service.ignite().port(config.localPort());

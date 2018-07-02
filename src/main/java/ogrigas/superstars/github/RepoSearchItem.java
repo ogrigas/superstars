@@ -16,4 +16,8 @@ public class RepoSearchItem {
     String license;
     URL url;
     int starCount;
+
+    public RepoKey key() {
+        return new RepoKey(owner, name);
+    }
 }

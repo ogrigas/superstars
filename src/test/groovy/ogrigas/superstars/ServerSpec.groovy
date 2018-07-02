@@ -2,6 +2,7 @@ package ogrigas.superstars
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.BasicCredentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -95,6 +96,8 @@ class ServerSpec extends Specification {
             .withQueryParam("anon", equalTo("true"))
             .withQueryParam("per_page", equalTo("1")))
 
+        github.verify(0, anyRequestedFor(urlPathMatching("/user/starred/.*")))
+
         response.code() == 200
         json(response) == [
             [
@@ -142,8 +145,47 @@ class ServerSpec extends Specification {
         ""                 | ""           || ["RepoA", "RepoB", "RepoC"]
     }
 
+    def "indicates which repositories were starred by the authenticated client"() {
+        given:
+        github.givenThat(get(urlPathEqualTo("/user/starred/UserA/RepoA")).willReturn(status(204)))
+        github.givenThat(get(urlPathEqualTo("/user/starred/UserB/RepoB")).willReturn(status(404)))
+        github.givenThat(get(urlPathEqualTo("/user/starred/UserC/RepoC")).willReturn(status(404)))
+
+        when:
+        def response = request(uri("/java-superstars").header("Authorization", basicAuth("USERNAME", "PASSWORD")))
+
+        then:
+        github.verify(3, getRequestedFor(urlPathMatching("/user/starred/.+/.+"))
+            .withBasicAuth(new BasicCredentials("USERNAME", "PASSWORD")))
+
+        response.code() == 200
+        json(response).collect { it.subMap(["name", "starredByMe"]) } == [
+            [name: "RepoA", starredByMe: true],
+            [name: "RepoB", starredByMe: false],
+            [name: "RepoC", starredByMe: false]
+        ]
+    }
+
+    def "supports token-based authentication"() {
+        given:
+        github.givenThat(get(urlPathMatching("/user/starred/.+/.+")).willReturn(status(204)))
+
+        when:
+        def response = request(uri("/java-superstars").header("Authorization", "token XYZ"))
+
+        then:
+        github.verify(3, getRequestedFor(urlPathMatching("/user/starred/.+/.+"))
+            .withHeader("Authorization", equalTo("token XYZ")))
+
+        response.code() == 200
+    }
+
     private Request.Builder uri(String uri) {
         new Request.Builder().url("http://localhost:$localPort" + uri)
+    }
+
+    private static String basicAuth(String username, String password) {
+        "Basic " + "$username:$password".bytes.encodeBase64()
     }
 
     private Response request(Request.Builder requestBuilder) {

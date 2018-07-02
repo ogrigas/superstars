@@ -1,8 +1,7 @@
 package ogrigas.superstars.java;
 
-import ogrigas.superstars.github.GithubRepos;
-import ogrigas.superstars.github.GithubSearch;
-import ogrigas.superstars.github.RepoSearchQuery;
+import ogrigas.superstars.github.*;
+import ogrigas.superstars.http.Authorization;
 
 import java.util.Comparator;
 import java.util.List;
@@ -13,15 +12,22 @@ public class JavaSuperstars {
 
     private final GithubSearch githubSearch;
     private final GithubRepos githubRepos;
+    private final GithubUserStarred githubUserStarred;
     private final int searchLimit;
 
-    public JavaSuperstars(GithubSearch githubSearch, GithubRepos githubRepos, int searchLimit) {
+    public JavaSuperstars(
+        GithubSearch githubSearch,
+        GithubRepos githubRepos,
+        GithubUserStarred githubUserStarred,
+        int searchLimit) {
+
         this.githubSearch = githubSearch;
         this.githubRepos = githubRepos;
+        this.githubUserStarred = githubUserStarred;
         this.searchLimit = searchLimit;
     }
 
-    public List<JavaFramework> list(Comparator<JavaFramework> sorting) {
+    public List<JavaFramework> list(Authorization auth, Comparator<JavaFramework> sorting) {
         RepoSearchQuery query = RepoSearchQuery.builder()
             .term("framework")
             .language("Java")
@@ -36,6 +42,7 @@ public class JavaSuperstars {
                 .repositoryUrl(repo.url())
                 .starCount(repo.starCount())
                 .contributorCount(githubRepos.totalContributors(repo.owner(), repo.name()))
+                .starredByMe(auth.provided() ? githubUserStarred.containsRepo(auth, repo.key()) : null)
                 .build())
             .sorted(sorting)
             .collect(toList());

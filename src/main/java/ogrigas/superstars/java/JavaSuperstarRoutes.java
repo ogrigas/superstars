@@ -1,6 +1,7 @@
 package ogrigas.superstars.java;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ogrigas.superstars.http.Authorization;
 import spark.ResponseTransformer;
 import spark.Service;
 
@@ -21,10 +22,13 @@ public class JavaSuperstarRoutes {
         ResponseTransformer toJson = jsonMapper::writeValueAsString;
         service.after((req, resp) -> resp.type("application/json"));
 
-        service.get("/java-superstars", (req, resp) -> {
-            String sortField = req.queryParamOrDefault("sortBy", "");
-            String direction = req.queryParamOrDefault("direction", "");
-            return javaSuperstars.list(JavaFramework.sorting(sortField, "ascending".equals(direction)));
-        }, toJson);
+        service.get("/java-superstars", (req, resp) ->
+            javaSuperstars.list(
+                Authorization.fromHeader(req.headers("Authorization")),
+                JavaFramework.sorting(
+                    req.queryParamOrDefault("sortBy", ""),
+                    req.queryParamOrDefault("direction", "").equals("ascending")
+                ))
+        , toJson);
     }
 }
