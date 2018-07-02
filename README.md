@@ -22,13 +22,40 @@ You will need:
 
     ./gradlew run
 
-Supported environment variables:
+### Usage
+
+Fetch most popular Java frameworks:
+
+    curl -i http://localhost:8080/java-superstars
+
+Sort by number of contributors, in ascending order:
+
+    curl -i "http://localhost:8080/java-superstars?sortBy=contributorCount&direction=ascending"
+
+Provide GitHub Basic credentials to include `starredByMe` flag in response:
+
+    curl -i -u "username:password" http://localhost:8080/java-superstars
+
+Alternatively, you may authenticate with GitHub token:
+
+    curl -i -H "Authorization: token {TOKEN}" http://localhost:8080/java-superstars
+
+Star a repo:
+
+    curl -i -u "username:password" -X PUT http://localhost:8080/java-superstars/{owner}/{repo}/star
+
+Unstar a repo:
+
+    curl -i -u "username:password" -X DELETE http://localhost:8080/java-superstars/{owner}/{repo}/star
+
+### Configuration via environment variables
+
 - `LOCAL_PORT` (default 8080)
 - `GITHUB_URL` (default https://api.github.com)
 - `SUPERSTAR_LIMIT` (default 10)
 - `HTTP_LOGGING`: BASIC, HEADERS, BODY or NONE (default BASIC)
 
-### Guidelines
+## Developer guidelines
 
 - Use [Karma-style git commit messages](http://karma-runner.github.io/2.0/dev/git-commit-msg.html)
 - Use [Lombok](https://projectlombok.org) annotations in Java data-classes to reduce boilerplate
