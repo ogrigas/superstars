@@ -60,3 +60,9 @@ Unstar a repo:
 - Use [Karma-style git commit messages](http://karma-runner.github.io/2.0/dev/git-commit-msg.html)
 - Use [Lombok](https://projectlombok.org) annotations in Java data-classes to reduce boilerplate
 - Use Groovy and Spock for writing readable BDD-style tests
+
+## Known issues
+
+If you don't provide credentials, you will quickly hit GitHub rate limit of max 60 requests per hour.
+The number of queries could be dramatically reduced by using GraphQL for joins, e.g. repos<->contributors.
+Unfortunately, GitHub does not allow anonymous use of GraphQL API as of this writing.
