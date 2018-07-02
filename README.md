@@ -18,11 +18,30 @@ You will need:
   - IntelliJ IDEA: install "Lombok Plugin"
   - Eclipse: [read this](https://howtodoinjava.com/automation/lombok-eclipse-installation-examples/) 
 
-## Running
+## Testing
+
+    ./gradlew test
+
+## Building and running
+
+Build and run directly from sources:
 
     ./gradlew run
 
-### Usage
+Build and run a Docker image: 
+
+    ./gradlew docker --info
+
+    docker run --rm -p 8080:8080 ogrigas/superstars
+
+### Configuration via environment variables
+
+- `LOCAL_PORT` (default is 8080)
+- `GITHUB_URL` (default is https://api.github.com)
+- `SUPERSTAR_LIMIT` (default is 10)
+- `HTTP_LOGGING`: "BASIC", "HEADERS", "BODY" or "NONE" (default is "BASIC")
+
+## Usage
 
 Fetch most popular Java frameworks:
 
@@ -47,13 +66,6 @@ Star a repo:
 Unstar a repo:
 
     curl -i -u "username:password" -X DELETE http://localhost:8080/java-superstars/{owner}/{repo}/star
-
-### Configuration via environment variables
-
-- `LOCAL_PORT` (default 8080)
-- `GITHUB_URL` (default https://api.github.com)
-- `SUPERSTAR_LIMIT` (default 10)
-- `HTTP_LOGGING`: BASIC, HEADERS, BODY or NONE (default BASIC)
 
 ## Developer guidelines
 
