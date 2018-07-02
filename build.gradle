@@ -38,6 +38,7 @@ dependencies {
         groovyDependency,
         "org.spockframework:spock-core:1.1-groovy-2.4",
         "com.github.tomakehurst:wiremock:2.18.0",
+        "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.6",
     )
 }
 

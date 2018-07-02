@@ -46,6 +46,10 @@ Build and run a Docker image:
 
 ## Usage
 
+Get OpenAPI specification:
+
+    curl http://localhost:8080/apidocs.yml
+
 Fetch most popular Java frameworks:
 
     curl -i http://localhost:8080/java-superstars

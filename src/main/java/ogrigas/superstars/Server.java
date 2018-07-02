@@ -48,6 +48,7 @@ public class Server {
             config.superstarLimit());
 
         service = Service.ignite().port(config.localPort());
+        service.staticFileLocation("/public");
         setupErrorHandling(service);
         new JavaSuperstarRoutes(javaSuperstars).addTo(service);
         service.awaitInitialization();

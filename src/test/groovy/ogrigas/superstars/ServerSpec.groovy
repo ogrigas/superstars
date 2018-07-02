@@ -1,6 +1,7 @@
 package ogrigas.superstars
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.BasicCredentials
 import okhttp3.OkHttpClient
@@ -80,6 +81,17 @@ class ServerSpec extends Specification {
     void cleanupSpec() {
         server.stop()
         github.stop()
+    }
+
+    def "serves OpenAPI specification"() {
+        when:
+        def response = request(uri("/apidocs.yml"))
+
+        then:
+        response.code() == 200
+        def doc = new ObjectMapper(new YAMLFactory()).readValue(response.body().string(), Map)
+        doc.openapi == "3.0.0"
+        doc.info?.title == "Java Superstars"
     }
 
     def "fetches most popular Java frameworks"() {

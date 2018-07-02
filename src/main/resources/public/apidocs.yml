@@ -1,0 +1,141 @@
+openapi: "3.0.0"
+
+info:
+  title: Java Superstars
+  version: "1.0"
+
+paths:
+  /java-superstars:
+    get:
+      summary: Returns top most popular Java Frameworks from GitHub
+      parameters:
+        - name: Authorization
+          in: header
+          description: optional GitHub credentials if you want to see which repos you have starred yourself
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: field to sort the results by
+          schema:
+            type: string
+            enum: [starCount, contributorCount]
+            default: starCount
+        - name: direction
+          in: query
+          description: sort order
+          schema:
+            type: string
+            enum: [ascending, descending]
+            default: descending
+      responses:
+        200:
+          description: List of popular Java frameworks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JavaFramework"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /java-superstars/{owner}/{repo}/star:
+    put:
+      summary: Stars a repo
+      parameters:
+        - name: Authorization
+          description: your GitHub credentials
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: owner
+          description: owner name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          description: repository name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Successfully starred
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Unstars a repo
+      parameters:
+        - name: Authorization
+          description: your GitHub credentials
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: owner
+          description: owner name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: repo
+          description: repository name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Successfully unstarred
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    JavaFramework:
+      required:
+        - owner
+        - name
+        - repositoryUrl
+        - starCount
+        - contributorCount
+      properties:
+        owner:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        license:
+          type: string
+        repositoryUrl:
+          type: string
+        starCount:
+          type: integer
+          format: int32
+        contributorCount:
+          type: integer
+          format: int32
+        starredByMe:
+          type: boolean
+    Error:
+      required:
+        - error
+      properties:
+        error:
+          type: string
