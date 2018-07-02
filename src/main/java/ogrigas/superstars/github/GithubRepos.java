@@ -1,8 +1,10 @@
 package ogrigas.superstars.github;
 
+import ogrigas.superstars.http.Authorization;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.HEAD;
+import retrofit2.http.Header;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -23,12 +25,18 @@ public class GithubRepos {
     }
 
     /**
-     * Calculates total number of contributors to the given repository, including anonymous ones.
-     * For efficiency, instead of fetching all contributors, we send a HEAD request for the first page
+     * Retrieves total number of contributors to the given repository, including anonymous ones.
+     * For efficiency, instead of fetching all contributors, we send a HEAD request with page size of 1
      * and then extract last page number from the "Link" header.
      */
-    public int totalContributors(RepoKey repo) {
-        Response response = client.request(api.repositoryContributors(repo.owner(), repo.name(), true, 1));
+    public int totalContributors(Authorization auth, RepoKey repo) {
+        Response response = client.request(api.repositoryContributors(
+            auth.optionalHeader(),
+            repo.owner(),
+            repo.name(),
+            true,
+            1
+        ));
         Links links = Links.parse(response.headers().get("Link"));
         return links.rel("last")
             .map(URL::getQuery)
@@ -43,6 +51,7 @@ public class GithubRepos {
 
         @HEAD("/repos/{owner}/{repo}/contributors")
         Call<Void> repositoryContributors(
+            @Header("Authorization") String authorization,
             @Path("owner") String owner,
             @Path("repo") String repoName,
             @Query("anon") boolean includeAnonymous,

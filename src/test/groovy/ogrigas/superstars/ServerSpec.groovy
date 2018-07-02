@@ -88,12 +88,14 @@ class ServerSpec extends Specification {
 
         then:
         github.verify(getRequestedFor(urlPathEqualTo("/search/repositories"))
+            .withoutHeader("Authorization")
             .withQueryParam("q", equalTo("framework language:Java"))
             .withQueryParam("sort", equalTo("stars"))
             .withQueryParam("order", equalTo("desc"))
             .withQueryParam("per_page", equalTo(config.superstarLimit() as String)))
 
         github.verify(3, headRequestedFor(urlPathMatching("/repos/.+/.+/contributors"))
+            .withoutHeader("Authorization")
             .withQueryParam("anon", equalTo("true"))
             .withQueryParam("per_page", equalTo("1")))
 
@@ -149,7 +151,7 @@ class ServerSpec extends Specification {
         ""                 | ""           || ["RepoA", "RepoB", "RepoC"]
     }
 
-    def "indicates which repositories were starred by the authenticated client"() {
+    def "accepts GitHub credentials and returns which repositories were starred by the client"() {
         given:
         github.givenThat(get(urlPathEqualTo("/user/starred/UserA/RepoA")).willReturn(status(204)))
         github.givenThat(get(urlPathEqualTo("/user/starred/UserB/RepoB")).willReturn(status(404)))
@@ -159,8 +161,9 @@ class ServerSpec extends Specification {
         def response = request(uri("/java-superstars").header("Authorization", basicAuth("USERNAME", "PASSWORD")))
 
         then:
-        github.verify(3, getRequestedFor(urlPathMatching("/user/starred/.+/.+"))
-            .withBasicAuth(new BasicCredentials("USERNAME", "PASSWORD")))
+        github.findAll(anyRequestedFor(anyUrl())).each {
+            assert it.header("Authorization").firstValue() == basicAuth("USERNAME", "PASSWORD")
+        }
 
         response.code() == 200
         json(response).collect { it.subMap(["name", "starredByMe"]) } == [
@@ -178,8 +181,9 @@ class ServerSpec extends Specification {
         def response = request(uri("/java-superstars").header("Authorization", "token XYZ"))
 
         then:
-        github.verify(3, getRequestedFor(urlPathMatching("/user/starred/.+/.+"))
-            .withHeader("Authorization", equalTo("token XYZ")))
+        github.findAll(anyRequestedFor(anyUrl())).each {
+            assert it.header("Authorization").firstValue() == "token XYZ"
+        }
 
         response.code() == 200
     }

@@ -34,7 +34,7 @@ public class JavaSuperstars {
             .limit(searchLimit)
             .build();
 
-        return githubSearch.topActiveRepositories(query).stream()
+        return githubSearch.topActiveRepositories(auth, query).stream()
             .map(repo -> JavaFramework.builder()
                 .owner(repo.owner())
                 .name(repo.name())
@@ -42,7 +42,7 @@ public class JavaSuperstars {
                 .license(repo.license())
                 .repositoryUrl(repo.url())
                 .starCount(repo.starCount())
-                .contributorCount(githubRepos.totalContributors(repo.key()))
+                .contributorCount(githubRepos.totalContributors(auth, repo.key()))
                 .starredByMe(auth.provided() ? githubUserStarred.containsRepo(auth, repo.key()) : null)
                 .build())
             .sorted(sorting)

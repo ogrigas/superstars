@@ -27,4 +27,8 @@ public class Authorization {
         }
         return header;
     }
+
+    public String optionalHeader() {
+        return header;
+    }
 }

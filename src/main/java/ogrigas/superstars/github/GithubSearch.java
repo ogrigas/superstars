@@ -1,7 +1,10 @@
 package ogrigas.superstars.github;
 
+import ogrigas.superstars.http.Authorization;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Query;
 
 import java.net.URL;
@@ -20,11 +23,15 @@ public class GithubSearch {
         this.api = client.proxy(Api.class);
     }
 
-    public List<RepoSearchItem> topActiveRepositories(RepoSearchQuery query) {
-        String q = query.term() + " language:" + query.language();
-        Call<Api.Results> apiCall = api.searchRepositories(q, Api.Sort.stars, Api.Order.desc, query.limit());
-        Api.Results results = client.request(apiCall).body();
-        return results == null ? emptyList() : results.items.stream()
+    public List<RepoSearchItem> topActiveRepositories(Authorization auth, RepoSearchQuery query) {
+        Response<Api.Results> response = client.request(api.searchRepositories(
+            auth.optionalHeader(),
+            query.term() + " language:" + query.language(),
+            Api.Sort.stars,
+            Api.Order.desc,
+            query.limit()
+        ));
+        return response.body() == null ? emptyList() : response.body().items.stream()
             .map(item -> RepoSearchItem.builder()
                 .owner(item.owner != null ? item.owner.login : null)
                 .name(item.name)
@@ -40,6 +47,7 @@ public class GithubSearch {
 
         @GET("/search/repositories")
         Call<Results> searchRepositories(
+            @Header("Authorization") String authorization,
             @Query("q") String query,
             @Query("sort") Sort sort,
             @Query("order") Order order,
