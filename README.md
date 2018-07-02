@@ -18,6 +18,9 @@ You will need:
   - IntelliJ IDEA: install "Lombok Plugin"
   - Eclipse: [read this](https://howtodoinjava.com/automation/lombok-eclipse-installation-examples/) 
 
+Gradle does not need to be install locally if you use the included `./gradlew` wrapper.
+Windows users should replace `./gradlew` with `gradlew.bat` in the following instructions.
+
 ## Testing
 
     ./gradlew test
