@@ -25,7 +25,7 @@ dependencies {
     annotationProcessor(lombokDependency)
     compileOnly(lombokDependency, groovyDependency)
     compile(
-        "com.sparkjava:spark-core:2.7.2",
+        "com.sparkjava:spark-core:2.7.1",
         "com.squareup.okhttp3:okhttp:$okHttpVersion",
         "com.squareup.okhttp3:logging-interceptor:$okHttpVersion",
         "com.squareup.retrofit2:retrofit:$retrofitVersion",

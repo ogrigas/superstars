@@ -199,6 +199,7 @@ class ServerSpec extends Specification {
             .withBasicAuth(new BasicCredentials("USERNAME", "PASSWORD")))
 
         response.code() == 204
+        response.header("Content-Type") == null
     }
 
     def "unstars a repository"() {
@@ -215,6 +216,7 @@ class ServerSpec extends Specification {
             .withBasicAuth(new BasicCredentials("USERNAME", "PASSWORD")))
 
         response.code() == 204
+        response.header("Content-Type") == null
     }
 
     private Request.Builder uri(String uri) {
@@ -230,7 +232,7 @@ class ServerSpec extends Specification {
     }
 
     private static Object json(Response response) {
-        assert response.body().contentType().toString() == 'application/json'
+        assert response.header("Content-Type") == 'application/json'
         return new ObjectMapper().readValue(response.body().string(), Object)
     }
 }
