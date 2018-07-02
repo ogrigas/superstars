@@ -14,11 +14,11 @@ import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
-public class GithubClient {
+public class Github {
 
     private final Retrofit retrofit;
 
-    public GithubClient(OkHttpClient okHttp, URL baseUrl) {
+    public Github(OkHttpClient okHttp, URL baseUrl) {
         retrofit = new Retrofit.Builder()
             .client(okHttp)
             .baseUrl(baseUrl.toString())

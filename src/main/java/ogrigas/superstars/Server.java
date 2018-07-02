@@ -1,6 +1,6 @@
 package ogrigas.superstars;
 
-import ogrigas.superstars.github.GithubClient;
+import ogrigas.superstars.github.Github;
 import ogrigas.superstars.github.GithubRepos;
 import ogrigas.superstars.github.GithubSearch;
 import ogrigas.superstars.github.GithubUserStarredRepos;
@@ -39,11 +39,11 @@ public class Server {
     }
 
     Server(Config config) {
-        GithubClient githubClient = new GithubClient(okHttp(config), config.githubUrl());
+        Github github = new Github(okHttp(config), config.githubUrl());
         JavaSuperstars javaSuperstars = new JavaSuperstars(
-            new GithubSearch(githubClient),
-            new GithubRepos(githubClient),
-            new GithubUserStarredRepos(githubClient),
+            new GithubSearch(github),
+            new GithubRepos(github),
+            new GithubUserStarredRepos(github),
             config.superstarLimit());
 
         service = Service.ignite().port(config.localPort());

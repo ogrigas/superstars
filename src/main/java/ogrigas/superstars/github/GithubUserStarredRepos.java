@@ -6,25 +6,24 @@ import retrofit2.http.*;
 
 public class GithubUserStarredRepos {
 
-    private final GithubClient client;
+    private final Github github;
     private final Api api;
 
-    public GithubUserStarredRepos(GithubClient client) {
-        this.client = client;
-        this.api = client.proxy(Api.class);
+    public GithubUserStarredRepos(Github github) {
+        this.github = github;
+        this.api = github.proxy(Api.class);
     }
 
     public boolean contains(Authorization auth, RepoKey repo) {
-        Call<Void> apiCall = api.get(auth.requireHeader(), repo.owner(), repo.name());
-        return client.request(apiCall).code() == 204;
+        return github.request(api.get(auth.requireHeader(), repo.owner(), repo.name())).code() == 204;
     }
 
     public void add(Authorization auth, RepoKey repo) {
-        client.request(api.put(auth.requireHeader(), repo.owner(), repo.name()));
+        github.request(api.put(auth.requireHeader(), repo.owner(), repo.name()));
     }
 
     public void remove(Authorization auth, RepoKey repo) {
-        client.request(api.delete(auth.requireHeader(), repo.owner(), repo.name()));
+        github.request(api.delete(auth.requireHeader(), repo.owner(), repo.name()));
     }
 
     private interface Api {

@@ -16,12 +16,12 @@ public class GithubRepos {
 
     private static final Pattern PAGE_PARAM_PATTERN = Pattern.compile(".*\\bpage=(\\d+).*");
 
-    private final GithubClient client;
+    private final Github github;
     private final Api api;
 
-    public GithubRepos(GithubClient client) {
-        this.client = client;
-        this.api = client.proxy(Api.class);
+    public GithubRepos(Github github) {
+        this.github = github;
+        this.api = github.proxy(Api.class);
     }
 
     /**
@@ -30,7 +30,7 @@ public class GithubRepos {
      * and then extract last page number from the "Link" header.
      */
     public int totalContributors(Authorization auth, RepoKey repo) {
-        Response response = client.request(api.repositoryContributors(
+        Response response = github.request(api.repositoryContributors(
             auth.optionalHeader(),
             repo.owner(),
             repo.name(),

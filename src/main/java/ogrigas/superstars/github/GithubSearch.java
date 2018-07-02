@@ -15,16 +15,16 @@ import static java.util.stream.Collectors.toList;
 
 public class GithubSearch {
 
-    private final GithubClient client;
+    private final Github github;
     private final Api api;
 
-    public GithubSearch(GithubClient client) {
-        this.client = client;
-        this.api = client.proxy(Api.class);
+    public GithubSearch(Github github) {
+        this.github = github;
+        this.api = github.proxy(Api.class);
     }
 
     public List<RepoSearchItem> topActiveRepositories(Authorization auth, RepoSearchQuery query) {
-        Response<Api.Results> response = client.request(api.searchRepositories(
+        Response<Api.Results> response = github.request(api.searchRepositories(
             auth.optionalHeader(),
             query.term() + " language:" + query.language(),
             Api.Sort.stars,
