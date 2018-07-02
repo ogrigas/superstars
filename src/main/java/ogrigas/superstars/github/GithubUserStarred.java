@@ -15,16 +15,16 @@ public class GithubUserStarred {
     }
 
     public boolean containsRepo(Authorization auth, RepoKey repo) {
-        Call<Void> apiCall = api.get(auth.header(), repo.owner(), repo.name());
+        Call<Void> apiCall = api.get(auth.requireHeader(), repo.owner(), repo.name());
         return client.request(apiCall).code() == 204;
     }
 
     public void addRepo(Authorization auth, RepoKey repo) {
-        client.request(api.put(auth.header(), repo.owner(), repo.name()));
+        client.request(api.put(auth.requireHeader(), repo.owner(), repo.name()));
     }
 
     public void removeRepo(Authorization auth, RepoKey repo) {
-        client.request(api.delete(auth.header(), repo.owner(), repo.name()));
+        client.request(api.delete(auth.requireHeader(), repo.owner(), repo.name()));
     }
 
     private interface Api {
