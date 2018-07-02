@@ -4,26 +4,26 @@ import ogrigas.superstars.http.Authorization;
 import retrofit2.Call;
 import retrofit2.http.*;
 
-public class GithubUserStarred {
+public class GithubUserStarredRepos {
 
     private final GithubClient client;
     private final Api api;
 
-    public GithubUserStarred(GithubClient client) {
+    public GithubUserStarredRepos(GithubClient client) {
         this.client = client;
         this.api = client.proxy(Api.class);
     }
 
-    public boolean containsRepo(Authorization auth, RepoKey repo) {
+    public boolean contains(Authorization auth, RepoKey repo) {
         Call<Void> apiCall = api.get(auth.requireHeader(), repo.owner(), repo.name());
         return client.request(apiCall).code() == 204;
     }
 
-    public void addRepo(Authorization auth, RepoKey repo) {
+    public void add(Authorization auth, RepoKey repo) {
         client.request(api.put(auth.requireHeader(), repo.owner(), repo.name()));
     }
 
-    public void removeRepo(Authorization auth, RepoKey repo) {
+    public void remove(Authorization auth, RepoKey repo) {
         client.request(api.delete(auth.requireHeader(), repo.owner(), repo.name()));
     }
 

@@ -12,18 +12,18 @@ public class JavaSuperstars {
 
     private final GithubSearch githubSearch;
     private final GithubRepos githubRepos;
-    private final GithubUserStarred githubUserStarred;
+    private final GithubUserStarredRepos githubUserStarredRepos;
     private final int searchLimit;
 
     public JavaSuperstars(
         GithubSearch githubSearch,
         GithubRepos githubRepos,
-        GithubUserStarred githubUserStarred,
+        GithubUserStarredRepos githubUserStarredRepos,
         int searchLimit) {
 
         this.githubSearch = githubSearch;
         this.githubRepos = githubRepos;
-        this.githubUserStarred = githubUserStarred;
+        this.githubUserStarredRepos = githubUserStarredRepos;
         this.searchLimit = searchLimit;
     }
 
@@ -43,17 +43,17 @@ public class JavaSuperstars {
                 .repositoryUrl(repo.url())
                 .starCount(repo.starCount())
                 .contributorCount(githubRepos.totalContributors(auth, repo.key()))
-                .starredByMe(auth.provided() ? githubUserStarred.containsRepo(auth, repo.key()) : null)
+                .starredByMe(auth.provided() ? githubUserStarredRepos.contains(auth, repo.key()) : null)
                 .build())
             .sorted(sorting)
             .collect(toList());
     }
 
     public void star(Authorization auth, RepoKey repo) {
-        githubUserStarred.addRepo(auth, repo);
+        githubUserStarredRepos.add(auth, repo);
     }
 
     public void unstar(Authorization auth, RepoKey repo) {
-        githubUserStarred.removeRepo(auth, repo);
+        githubUserStarredRepos.remove(auth, repo);
     }
 }
