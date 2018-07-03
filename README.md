@@ -79,6 +79,9 @@ Unstar a repo:
 - Use [Karma-style git commit messages](http://karma-runner.github.io/2.0/dev/git-commit-msg.html)
 - Use [Lombok](https://projectlombok.org) annotations in Java data-classes to reduce boilerplate
 - Use Groovy and Spock for writing readable BDD-style tests
+- Every runtime dependency brings incidental complexity, so add them only if you find yourself reinventing the wheel
+  - keep an eye on `gradle dependencies --configuration runtime`
+  - so far I avoided the need for Guava, Apache Commons, or heavyweight frameworks
 
 ## Known issues
 
