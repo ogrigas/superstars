@@ -1,7 +1,6 @@
 package ogrigas.superstars.github;
 
 import ogrigas.superstars.http.Authorization;
-import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -9,6 +8,7 @@ import retrofit2.http.Query;
 
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -23,30 +23,27 @@ public class GithubSearch {
         this.api = github.proxy(Api.class);
     }
 
-    public List<RepoSearchItem> topActiveRepositories(Authorization auth, RepoSearchQuery query) {
-        Response<Api.Results> response = github.request(api.searchRepositories(
-            auth.optionalHeader(),
-            query.term() + " language:" + query.language(),
-            Api.Sort.stars,
-            Api.Order.desc,
-            query.limit()
-        ));
-        return response.body() == null ? emptyList() : response.body().items.stream()
-            .map(item -> RepoSearchItem.builder()
-                .owner(item.owner != null ? item.owner.login : null)
-                .name(item.name)
-                .description(item.description)
-                .license(item.license != null ? item.license.name : null)
-                .url(item.url)
-                .starCount(item.stargazers_count)
-                .build())
-            .collect(toList());
+    public CompletableFuture<List<RepoSearchItem>> topActiveRepositories(Authorization auth, RepoSearchQuery q) {
+        String query = q.term() + " language:" + q.language();
+        return api.searchRepositories(auth.optionalHeader(), query, Api.Sort.stars, Api.Order.desc, q.limit())
+            .whenComplete(github::handleErrors)
+            .thenApply(Response::body)
+            .thenApply(body -> body == null ? emptyList() : body.items.stream()
+                .map(item -> RepoSearchItem.builder()
+                    .owner(item.owner != null ? item.owner.login : null)
+                    .name(item.name)
+                    .description(item.description)
+                    .license(item.license != null ? item.license.name : null)
+                    .url(item.url)
+                    .starCount(item.stargazers_count)
+                    .build())
+                .collect(toList()));
     }
 
     private interface Api {
 
         @GET("/search/repositories")
-        Call<Results> searchRepositories(
+        CompletableFuture<Response<Results>> searchRepositories(
             @Header("Authorization") String authorization,
             @Query("q") String query,
             @Query("sort") Sort sort,

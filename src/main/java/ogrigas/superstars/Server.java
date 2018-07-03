@@ -18,6 +18,7 @@ import spark.Service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.CompletionException;
 
 import static java.lang.Integer.parseInt;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -57,6 +58,7 @@ public class Server {
 
     private void setupErrorHandling(Service service) {
         service.exception(HttpError.class, (ex, req, resp) -> ex.writeTo(resp));
+        service.exception(CompletionException.class, (ex, req, resp) -> HttpError.tryUnwrap(ex).writeTo(resp));
         service.notFound((req, resp) -> new HttpError(404, "Not Found").writeTo(resp));
         service.internalServerError((req, resp) -> new HttpError(500, "Internal Error").writeTo(resp));
     }

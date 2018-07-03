@@ -17,6 +17,13 @@ public class HttpError extends RuntimeException {
         this.statusCode = statusCode;
     }
 
+    public static HttpError tryUnwrap(RuntimeException ex) {
+        if (ex.getCause() instanceof HttpError) {
+            return (HttpError) ex.getCause();
+        }
+        throw ex;
+    }
+
     public String writeTo(Response response) {
         response.status(statusCode);
         response.type("application/json");
