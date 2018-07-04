@@ -8,7 +8,7 @@ import spark.Request;
 import spark.Response;
 import spark.Service;
 
-import java.util.Comparator;
+import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
@@ -28,11 +28,11 @@ public class JavaSuperstarRoutes {
 
     public void addTo(Service service) {
         service.get("/java-superstars", (request, response) -> {
-            Comparator<JavaFramework> sorting = JavaFramework.sorting(
-                request.queryParamOrDefault("sortBy", ""),
-                request.queryParamOrDefault("direction", "").equals("ascending")
-            );
-            return json(response, javaSuperstars.list(Authorization.from(request), sorting));
+            List<JavaFramework> frameworks = javaSuperstars.list(Authorization.from(request),
+                JavaFramework.sorting(
+                    request.queryParamOrDefault("sortBy", ""),
+                    request.queryParamOrDefault("direction", "").equals("ascending")));
+            return json(response, frameworks);
         });
 
         service.put("/java-superstars/:owner/:repoName/star", (request, response) -> {
